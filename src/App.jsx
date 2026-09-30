@@ -9,20 +9,20 @@ function App() {
   const [status, setStatus] = useState('Not started')
 
   useEffect(() => {
-    if (!running || !url) return
+    if (!running || !url.trim()) return
 
     const checkUrl = async () => {
       setStatus('Checking...')
 
       try {
-        const response = await fetch(url, {
+        await fetch(url.trim(), {
           method: 'GET',
           mode: 'no-cors',
           cache: 'no-store'
         })
 
-        setStatus('Check completed')
-      } catch (error) {
+        setStatus('Website checked')
+      } catch {
         setStatus('Check failed')
       }
 
@@ -31,17 +31,23 @@ function App() {
 
     checkUrl()
 
-    const timer = setInterval(checkUrl, interval * 60 * 1000)
+    const timer = setInterval(
+      checkUrl,
+      interval * 60 * 1000
+    )
 
     return () => clearInterval(timer)
   }, [running, url, interval])
 
   const startMonitoring = () => {
-    if (!url.trim()) {
+    const cleanUrl = url.trim()
+
+    if (!cleanUrl) {
       setStatus('Please enter a URL')
       return
     }
 
+    setUrl(cleanUrl)
     setRunning(true)
     setStatus('Monitoring started')
   }
@@ -53,19 +59,42 @@ function App() {
 
   return (
     <div className="app">
-      <div className="card">
-        <h1>URL Monitor</h1>
-        <p className="subtitle">Website & API monitoring</p>
+
+      <header className="topbar">
+        <div className="logo">U</div>
+
+        <div>
+          <h1>URL Monitor</h1>
+          <p>Website & API Monitor</p>
+        </div>
+      </header>
+
+      <main className="card">
+
+        <div className="welcome">
+          <h2>Monitor your URL</h2>
+          <p>
+            Check your website automatically at your selected interval.
+          </p>
+        </div>
 
         <label>Website / API URL</label>
-        <input
-          type="url"
-          placeholder="https://example.com"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
+
+        <div className="urlBox">
+          <span>🔗</span>
+
+          <input
+            type="url"
+            placeholder="https://example.com"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            autoComplete="off"
+            spellCheck="false"
+          />
+        </div>
 
         <label>Check interval</label>
+
         <select
           value={interval}
           onChange={(e) => setIntervalValue(Number(e.target.value))}
@@ -78,23 +107,36 @@ function App() {
         </select>
 
         {!running ? (
-          <button onClick={startMonitoring}>Start Monitoring</button>
+          <button onClick={startMonitoring}>
+            ▶ Start Monitoring
+          </button>
         ) : (
           <button className="stop" onClick={stopMonitoring}>
-            Stop Monitoring
+            ■ Stop Monitoring
           </button>
         )}
 
-        <div className="status">
-          <strong>Status:</strong> {status}
+        <div className="statusCard">
+          <div className="statusDot"></div>
+
+          <div>
+            <small>Status</small>
+            <strong>{status}</strong>
+          </div>
         </div>
 
         {lastCheck && (
-          <div className="last">
+          <div className="lastCheck">
             Last check: {lastCheck}
           </div>
         )}
-      </div>
+
+      </main>
+
+      <footer>
+        © Gautam Tiwari from Nexora ❤️‍🩹
+      </footer>
+
     </div>
   )
 }

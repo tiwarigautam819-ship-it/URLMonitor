@@ -4,92 +4,171 @@
 
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f4f7fb;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f7fb;
   color: #172033;
 }
 
 .app {
   min-height: 100vh;
   display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  height: 78px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 0 20px;
+  background: #ffffff;
+  border-bottom: 1px solid #e8ebf0;
+}
+
+.logo {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
+  background: #2563eb;
+  color: white;
+  font-size: 25px;
+  font-weight: 800;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.topbar p {
+  margin: 3px 0 0;
+  color: #718096;
+  font-size: 12px;
 }
 
 .card {
-  width: 100%;
-  max-width: 430px;
-  background: white;
-  padding: 28px;
-  border-radius: 24px;
-  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.08);
+  width: calc(100% - 32px);
+  max-width: 480px;
+  margin: 24px auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 22px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.07);
 }
 
-h1 {
+.welcome h2 {
   margin: 0;
-  font-size: 30px;
-  text-align: center;
+  font-size: 24px;
 }
 
-.subtitle {
-  text-align: center;
-  color: #6b7280;
-  margin: 8px 0 30px;
+.welcome p {
+  margin: 7px 0 25px;
+  color: #718096;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 label {
   display: block;
-  font-weight: 600;
-  margin: 18px 0 8px;
+  margin: 17px 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.urlBox {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 13px;
+  border: 1px solid #d9dee8;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.urlBox:focus-within {
+  border-color: #2563eb;
+}
+
+.urlBox span {
+  font-size: 17px;
 }
 
 input,
 select {
   width: 100%;
-  padding: 14px;
-  border: 1px solid #d8dee9;
-  border-radius: 12px;
-  font-size: 15px;
+  height: 50px;
+  border: 0;
   outline: none;
-  background: white;
+  background: transparent;
+  font-size: 15px;
+  color: #172033;
 }
 
-input:focus,
-select:focus {
-  border-color: #2563eb;
+select {
+  border: 1px solid #d9dee8;
+  border-radius: 13px;
+  padding: 0 13px;
+  background: white;
 }
 
 button {
   width: 100%;
+  height: 52px;
   margin-top: 24px;
-  padding: 15px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 13px;
   background: #2563eb;
   color: white;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
-}
-
-button:active {
-  transform: scale(0.98);
 }
 
 button.stop {
   background: #dc2626;
 }
 
-.status {
-  margin-top: 24px;
+.statusCard {
+  margin-top: 20px;
   padding: 15px;
-  background: #f1f5f9;
-  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-radius: 14px;
+  background: #f5f7fb;
 }
 
-.last {
-  margin-top: 10px;
-  color: #64748b;
-  font-size: 13px;
+.statusDot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #22c55e;
+}
+
+.statusCard small {
+  display: block;
+  color: #718096;
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+
+.statusCard strong {
+  font-size: 14px;
+}
+
+.lastCheck {
   text-align: center;
+  margin-top: 12px;
+  color: #718096;
+  font-size: 12px;
+}
+
+footer {
+  margin-top: auto;
+  padding: 20px 10px;
+  text-align: center;
+  color: #7b8494;
+  font-size: 12px;
 }
