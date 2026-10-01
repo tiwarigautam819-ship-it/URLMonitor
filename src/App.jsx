@@ -1,60 +1,140 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useEffect, useState } from "react";
+import "./App.css";
+import {
+  loginUser,
+  registerUser,
+  loginWithGoogle,
+  logoutUser,
+  getUserProfile,
+  onAuthStateChanged
+} from "./firebase/authService";
 
 function App() {
-  const [url, setUrl] = useState('')
-  const [interval, setIntervalValue] = useState(15)
-  const [running, setRunning] = useState(false)
-  const [lastCheck, setLastCheck] = useState(null)
-  const [status, setStatus] = useState('Not started')
+  const [user, setUser] = useState(null);
+  const [isPro, setIsPro] = useState(false);
+  const [mode, setMode] = useState("login");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!running || !url.trim()) return
+    const unsubscribe = onAuthStateChanged(authUser => {
+      setUser(authUser);
 
-    const checkUrl = async () => {
-      setStatus('Checking...')
-
-      try {
-        await fetch(url.trim(), {
-          method: 'GET',
-          mode: 'no-cors',
-          cache: 'no-store'
-        })
-
-        setStatus('Website checked')
-      } catch {
-        setStatus('Check failed')
+      if (authUser) {
+        getUserProfile(authUser.uid)
+          .then(profile => setIsPro(profile.isPro === true))
+          .catch(() => setIsPro(false));
+      } else {
+        setIsPro(false);
       }
 
-      setLastCheck(new Date().toLocaleString())
+      setLoading(false);
+    });
+
+    return unsubscribe;
+  }, []);
+
+  const handleEmailAuth = async (e) => {
+    e.preventDefault();
+    setMessage("");
+
+    try {
+      if (mode === "login") {
+        await loginUser(email, password);
+      } else {
+        await registerUser(email, password);
+      }
+    } catch (error) {
+      setMessage(error.message);
     }
+  };
 
-    checkUrl()
+  const handleGoogle = async () => {
+    setMessage("");
 
-    const timer = setInterval(
-      checkUrl,
-      interval * 60 * 1000
-    )
-
-    return () => clearInterval(timer)
-  }, [running, url, interval])
-
-  const startMonitoring = () => {
-    const cleanUrl = url.trim()
-
-    if (!cleanUrl) {
-      setStatus('Please enter a URL')
-      return
+    try {
+      await loginWithGoogle();
+    } catch (error) {
+      setMessage(error.message);
     }
+  };
 
-    setUrl(cleanUrl)
-    setRunning(true)
-    setStatus('Monitoring started')
+  if (loading) {
+    return <div className="center">Loading...</div>;
   }
 
-  const stopMonitoring = () => {
-    setRunning(false)
-    setStatus('Monitoring stopped')
+  if (!user) {
+    return (
+      <div className="authPage">
+        <div className="authCard">
+
+          <div className="logo">U</div>
+
+          <h1>URL Monitor</h1>
+          <p className="subtitle">
+            Monitor your websites easily
+          </p>
+
+          <button className="googleBtn" onClick={handleGoogle}>
+            Continue with Google
+          </button>
+
+          <div className="divider">
+            <span>OR</span>
+          </div>
+
+          <form onSubmit={handleEmailAuth}>
+
+            <input
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            <button type="submit">
+              {mode === "login" ? "Login" : "Create Account"}
+            </button>
+
+          </form>
+
+          {message && (
+            <p className="error">{message}</p>
+          )}
+
+          <p className="switch">
+            {mode === "login"
+              ? "Don't have an account?"
+              : "Already have an account?"}
+
+            <button
+              className="linkBtn"
+              onClick={() =>
+                setMode(mode === "login" ? "register" : "login")
+              }
+            >
+              {mode === "login" ? " Sign up" : " Login"}
+            </button>
+          </p>
+
+        </div>
+
+        <footer>
+          © Gautam Tiwari from Nexora ❤️‍🩹
+        </footer>
+      </div>
+    );
   }
 
   return (
@@ -65,71 +145,44 @@ function App() {
 
         <div>
           <h1>URL Monitor</h1>
-          <p>Website & API Monitor</p>
+          <p>{isPro ? "PRO Plan" : "Free Plan"}</p>
         </div>
       </header>
 
       <main className="card">
 
-        <div className="welcome">
-          <h2>Monitor your URL</h2>
+        <h2>Welcome 👋</h2>
+
+        <p>
+          {user.email}
+        </p>
+
+        <div className="planCard">
+          <strong>
+            {isPro ? "⭐ PRO MEMBER" : "FREE PLAN"}
+          </strong>
+
           <p>
-            Check your website automatically at your selected interval.
+            {isPro
+              ? "Multiple URL monitoring enabled."
+              : "You can monitor 1 URL."}
           </p>
         </div>
 
-        <label>Website / API URL</label>
-
-        <div className="urlBox">
-          <span>🔗</span>
-
-          <input
-            type="url"
-            placeholder="https://example.com"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            autoComplete="off"
-            spellCheck="false"
-          />
-        </div>
-
-        <label>Check interval</label>
-
-        <select
-          value={interval}
-          onChange={(e) => setIntervalValue(Number(e.target.value))}
-          disabled={running}
-        >
-          <option value="10">Every 10 minutes</option>
-          <option value="15">Every 15 minutes</option>
-          <option value="30">Every 30 minutes</option>
-          <option value="60">Every 60 minutes</option>
-        </select>
-
-        {!running ? (
-          <button onClick={startMonitoring}>
-            ▶ Start Monitoring
-          </button>
-        ) : (
-          <button className="stop" onClick={stopMonitoring}>
-            ■ Stop Monitoring
+        {!isPro && (
+          <button
+            onClick={() => {
+              window.location.href =
+                "https://wa.me/918955932061?text=Hello%2C%20I%20want%20to%20upgrade%20my%20URL%20Monitor%20account%20to%20Pro.";
+            }}
+          >
+            ⭐ Upgrade to Pro — ₹49/year
           </button>
         )}
 
-        <div className="statusCard">
-          <div className="statusDot"></div>
-
-          <div>
-            <small>Status</small>
-            <strong>{status}</strong>
-          </div>
-        </div>
-
-        {lastCheck && (
-          <div className="lastCheck">
-            Last check: {lastCheck}
-          </div>
-        )}
+        <button className="stop" onClick={logoutUser}>
+          Logout
+        </button>
 
       </main>
 
@@ -138,7 +191,7 @@ function App() {
       </footer>
 
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
