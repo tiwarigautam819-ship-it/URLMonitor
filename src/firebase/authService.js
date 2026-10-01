@@ -39,10 +39,7 @@ export const loginUser = (email, password) =>
   signInWithEmailAndPassword(auth, email, password);
 
 export const loginWithGoogle = async () => {
-  const result = await signInWithPopup(
-    auth,
-    googleProvider
-  );
+  const result = await signInWithPopup(auth, googleProvider);
 
   const userRef = doc(db, "users", result.user.uid);
   const snapshot = await getDoc(userRef);
@@ -71,17 +68,14 @@ export const loginWithGoogle = async () => {
 export const logoutUser = () => signOut(auth);
 
 export const getUserProfile = async (uid) => {
-  const snapshot = await getDoc(
-    doc(db, "users", uid)
-  );
+  const snapshot = await getDoc(doc(db, "users", uid));
 
   if (!snapshot.exists()) {
-    return {
-      isPro: false
-    };
+    return { isPro: false };
   }
 
   return snapshot.data();
 };
 
-export { onAuthStateChanged };
+export const watchAuthState = (callback) =>
+  onAuthStateChanged(auth, callback);

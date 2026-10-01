@@ -7,7 +7,7 @@ import {
   loginWithGoogle,
   logoutUser,
   getUserProfile,
-  onAuthStateChanged
+  watchAuthState
 } from "./firebase/authService";
 
 import AdminPanel from "./AdminPanel";
@@ -33,7 +33,7 @@ function App() {
   const [urls, setUrls] = useState([]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(async (authUser) => {
+    const unsubscribe = watchAuthState(async (authUser) => {
       setUser(authUser);
 
       if (authUser) {
