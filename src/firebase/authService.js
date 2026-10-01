@@ -39,18 +39,31 @@ export const loginUser = (email, password) =>
   signInWithEmailAndPassword(auth, email, password);
 
 export const loginWithGoogle = async () => {
-  const result = await signInWithPopup(auth, googleProvider);
+  const result = await signInWithPopup(
+    auth,
+    googleProvider
+  );
 
-  await setDoc(
-    doc(db, "users", result.user.uid),
-    {
+  const userRef = doc(db, "users", result.user.uid);
+  const snapshot = await getDoc(userRef);
+
+  if (!snapshot.exists()) {
+    await setDoc(userRef, {
       email: result.user.email,
       name: result.user.displayName || "",
       isPro: false,
       createdAt: serverTimestamp()
-    },
-    { merge: true }
-  );
+    });
+  } else {
+    await setDoc(
+      userRef,
+      {
+        email: result.user.email,
+        name: result.user.displayName || ""
+      },
+      { merge: true }
+    );
+  }
 
   return result.user;
 };
@@ -58,10 +71,14 @@ export const loginWithGoogle = async () => {
 export const logoutUser = () => signOut(auth);
 
 export const getUserProfile = async (uid) => {
-  const snapshot = await getDoc(doc(db, "users", uid));
+  const snapshot = await getDoc(
+    doc(db, "users", uid)
+  );
 
   if (!snapshot.exists()) {
-    return { isPro: false };
+    return {
+      isPro: false
+    };
   }
 
   return snapshot.data();
