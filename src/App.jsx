@@ -456,7 +456,7 @@ function App() {
             className={page === "admin" ? "active" : ""}
             onClick={() => setPage("admin")}
           >
-            🖕🏿
+            🪙
             <span>Admin</span>
           </button>
         )}
